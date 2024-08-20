@@ -1,7 +1,13 @@
 package entity
 
 import (
-	"github.com/drawiin/go-orders-service/internal/failure"
+	"errors"
+)
+
+var (
+	ErrInvalidId    = errors.New("invalid id")
+	ErrInvalidPrice = errors.New("invalid price")
+	ErrInvalidTax   = errors.New("invalid tax")
 )
 
 type Order struct {
@@ -28,13 +34,13 @@ func NewOrder(id string, price float64, tax float64) (*Order, error) {
 
 func (o *Order) IsValid() error {
 	if o.ID == "" {
-		return failure.ErrInvalidId
+		return ErrInvalidId
 	}
 	if o.Price <= 0 {
-		return failure.ErrInvalidPrice
+		return ErrInvalidPrice
 	}
 	if o.Tax <= 0 {
-		return failure.ErrInvalidTax
+		return ErrInvalidTax
 	}
 	return nil
 }
