@@ -2,18 +2,17 @@ package usecase
 
 import (
 	"github.com/drawiin/go-orders-service/internal/entity"
-	"github.com/drawiin/go-orders-service/internal/repository"
 	"github.com/drawiin/go-orders-service/pkg/events"
 )
 
 type CreateOrderUseCase struct {
-	OrderRepository repository.OrderRepository
+	OrderRepository entity.OrderRepositoryInterface
 	OrderCreated    events.EventInterface
 	EventDispatcher events.EventDispatcherInterface
 }
 
 func NewCreateOrderUseCase(
-	OrderRepository repository.OrderRepository,
+	OrderRepository entity.OrderRepositoryInterface,
 	OrderCreated events.EventInterface,
 	EventDispatcher events.EventDispatcherInterface,
 ) *CreateOrderUseCase {

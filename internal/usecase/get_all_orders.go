@@ -1,12 +1,12 @@
 package usecase
 
-import "github.com/drawiin/go-orders-service/internal/repository"
+import "github.com/drawiin/go-orders-service/internal/entity"
 
 type GetAllOrdersUseCase struct {
-	OrderRepository repository.OrderRepository
+	OrderRepository entity.OrderRepositoryInterface
 }
 
-func NewGetAllOrdersUseCase(OrderRepository repository.OrderRepository) *GetAllOrdersUseCase {
+func NewGetAllOrdersUseCase(OrderRepository entity.OrderRepositoryInterface) *GetAllOrdersUseCase {
 	return &GetAllOrdersUseCase{
 		OrderRepository: OrderRepository,
 	}
