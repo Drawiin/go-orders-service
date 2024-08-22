@@ -1,3 +1,5 @@
+
+
 package main
 
 import (
@@ -18,24 +20,29 @@ var OrderRepositorySet = wire.NewSet(
 )
 
 var EventDispatcherSet = wire.NewSet(
-	events.NewEventDispatcher,
 	event.NewOrderCreated,
 	wire.Bind(new(events.EventInterface), new(*event.OrderCreated)),
-	wire.Bind(new(events.EventDispatcherInterface), new(*events.EventDispatcher)),
 )
 
-func NewCreateOrderUseCase(db db.DBTX) *usecase.CreateOrderUseCase {
-	wire.Build(OrderRepositorySet, EventDispatcherSet, usecase.NewCreateOrderUseCase)
-	return &usecase.CreateOrderUseCase{}
-}
+var CreateOrderUseCaseSet = wire.NewSet(
+	EventDispatcherSet,
+	usecase.NewCreateOrderUseCase,
+)
 
-func NewWebOrderHandler(db db.DBTX) *web_handler.WebOrderHandler {
+var GetAllOrdersUseCaseSet = wire.NewSet(
+	usecase.NewGetAllOrdersUseCase,
+)
+
+var GetOrderByIdUseCaseSet = wire.NewSet(
+	usecase.NewGetOrderByIdUseCase,
+)
+
+func NewWebOrderHandler(db db.DBTX, eventDispatcher events.EventDispatcherInterface) *web_handler.WebOrderHandler {
 	wire.Build(
 		OrderRepositorySet,
-		EventDispatcherSet,
-		usecase.NewCreateOrderUseCase,
-		usecase.NewGetAllOrdersUseCase,
-		usecase.NewGetOrderByIdUseCase,
+		CreateOrderUseCaseSet,
+		GetAllOrdersUseCaseSet,
+		GetOrderByIdUseCaseSet,
 		web_handler.NewWebOrderHandler,
 	)
 	return &web_handler.WebOrderHandler{}

@@ -18,17 +18,19 @@ import (
 func main() {
 	config := getAppConfig()
 
-	dbConnection := getDbConnection(config)
-	defer dbConnection.Close()
-
 	eventDispatcher := events.NewEventDispatcher()
 	eventDispatcher.Register("order.created", handler.NewOrderCreatedHandler(getRabbitMQChannel(config)))
 
-	// Setup WebServer
-	webserver := webserver.NewWebServer(config.WebServerPort)
-	// webserver.AddHandler("/orders", NewWebOrderHandler(dbQueries, eventDispatcher))
+	dbConnection := getDbConnection(config)
+	defer dbConnection.Close()
 
-	// Start web server
+	startWebServer(config, dbConnection, eventDispatcher)
+}
+
+func startWebServer(config *config.Config, dbConnection *sql.DB, eventDispatcher *events.EventDispatcher) {
+	webserver := webserver.NewWebServer(config.WebServerPort)
+	webHandler := NewWebOrderHandler(dbConnection, eventDispatcher)
+	webserver.AddHandler("/orders", webHandler.Create)
 	webserver.Start()
 }
 
