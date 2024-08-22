@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 
 	graphql_handler "github.com/99designs/gqlgen/graphql/handler"
@@ -11,9 +12,12 @@ import (
 	"github.com/drawiin/go-orders-service/config"
 	"github.com/drawiin/go-orders-service/internal/event/handler"
 	"github.com/drawiin/go-orders-service/internal/infra/graph"
+	"github.com/drawiin/go-orders-service/internal/infra/grpc/pb"
 	"github.com/drawiin/go-orders-service/internal/infra/web/webserver"
 	"github.com/drawiin/go-orders-service/pkg/events"
 	"github.com/streadway/amqp"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	// mysql
 	_ "github.com/go-sql-driver/mysql"
@@ -29,7 +33,8 @@ func main() {
 	eventDispatcher.Register("order.created", handler.NewOrderCreatedHandler(getRabbitMQChannel(config)))
 
 	go startWebServer(config, dbConnection, eventDispatcher)
-	startGraphQLServer(config, dbConnection, eventDispatcher)
+	go startGraphQLServer(config, dbConnection, eventDispatcher)
+	startGrpcServer(config, dbConnection, eventDispatcher)
 }
 
 func startWebServer(config *config.Config, dbConnection *sql.DB, eventDispatcher *events.EventDispatcher) {
@@ -48,6 +53,22 @@ func startGraphQLServer(config *config.Config, dbConnection *sql.DB, eventDispat
 	http.Handle("/query", srv)
 	fmt.Println("Starting GraphQL server on port", config.GraphQLServerPort)
 	http.ListenAndServe(":"+config.GraphQLServerPort, nil)
+}
+
+func startGrpcServer(config *config.Config, dbConnection *sql.DB, eventDispatcher *events.EventDispatcher) {
+	grpcServer := grpc.NewServer()
+	pb.RegisterOrderServiceServer(grpcServer, NewGrpcService(dbConnection, eventDispatcher))
+	reflection.Register(grpcServer)
+
+	lis, err := net.Listen("tcp", ":"+config.GRPCServerPort)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Starting gRPC server on port", config.GRPCServerPort)
+	if err := grpcServer.Serve(lis); err != nil {
+		panic(err)
+	}
 }
 
 func getDbConnection(config *config.Config) *sql.DB {

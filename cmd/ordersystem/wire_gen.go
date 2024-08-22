@@ -10,6 +10,7 @@ import (
 	"github.com/drawiin/go-orders-service/internal/event"
 	"github.com/drawiin/go-orders-service/internal/infra/db"
 	"github.com/drawiin/go-orders-service/internal/infra/graph"
+	"github.com/drawiin/go-orders-service/internal/infra/grpc/service"
 	"github.com/drawiin/go-orders-service/internal/infra/repository"
 	"github.com/drawiin/go-orders-service/internal/infra/web/web_handler"
 	"github.com/drawiin/go-orders-service/internal/usecase"
@@ -42,4 +43,15 @@ func NewGraphQLResolver(db2 db.DBTX, eventDispatcher events.EventDispatcherInter
 	getOrderByIdUseCase := usecase.NewGetOrderByIdUseCase(orderRepository)
 	resolver := graph.NewResolver(createOrderUseCase, getAllOrdersUseCase, getOrderByIdUseCase)
 	return resolver
+}
+
+func NewGrpcService(db2 db.DBTX, eventDispatcher events.EventDispatcherInterface) *grpc_service.OrderService {
+	queries := db.New(db2)
+	orderRepository := repository.NewOrderRepository(queries)
+	orderCreated := event.NewOrderCreated()
+	createOrderUseCase := usecase.NewCreateOrderUseCase(orderRepository, orderCreated, eventDispatcher)
+	getAllOrdersUseCase := usecase.NewGetAllOrdersUseCase(orderRepository)
+	getOrderByIdUseCase := usecase.NewGetOrderByIdUseCase(orderRepository)
+	orderService := grpc_service.NewOrderService(createOrderUseCase, getAllOrdersUseCase, getOrderByIdUseCase)
+	return orderService
 }

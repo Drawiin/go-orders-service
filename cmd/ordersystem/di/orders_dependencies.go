@@ -5,6 +5,7 @@ import (
 	"github.com/drawiin/go-orders-service/internal/event"
 	"github.com/drawiin/go-orders-service/internal/infra/db"
 	"github.com/drawiin/go-orders-service/internal/infra/graph"
+	grpc_service "github.com/drawiin/go-orders-service/internal/infra/grpc/service"
 	"github.com/drawiin/go-orders-service/internal/infra/repository"
 	"github.com/drawiin/go-orders-service/internal/infra/web/web_handler"
 	"github.com/drawiin/go-orders-service/internal/usecase"
@@ -50,4 +51,12 @@ var GraphQLResolverSet = wire.NewSet(
 	GetAllOrdersUseCaseSet,
 	GetOrderByIdUseCaseSet,
 	graph.NewResolver,
+)
+
+var GrpcServiceSet = wire.NewSet(
+	OrderRepositorySet,
+	CreateOrderUseCaseSet,
+	GetAllOrdersUseCaseSet,
+	GetOrderByIdUseCaseSet,
+	grpc_service.NewOrderService,
 )
