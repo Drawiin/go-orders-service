@@ -47,3 +47,11 @@ func (h *WebOrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (h *WebOrderHandler) GetAll(w http.ResponseWriter, r *http.Request)  {
+
+}
+
+func (h *WebOrderHandler) GetById(w http.ResponseWriter, r *http.Request)  {
+	
+}
