@@ -9,7 +9,7 @@ type OrderCreated struct {
 
 func NewOrderCreated() *OrderCreated {
 	return &OrderCreated{
-		Name: "OrderCreated",
+		Name: "order.created",
 	}
 }
 

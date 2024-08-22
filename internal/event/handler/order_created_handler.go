@@ -28,7 +28,6 @@ func (h *OrderCreatedHandler) Handle(event events.EventInterface, wg *sync.WaitG
 		ContentType: "application/json",
 		Body:        jsonOutput,
 	}
-
 	h.RabbitMQChannel.Publish(
 		"amq.direct", // exchange
 		"",           // key name

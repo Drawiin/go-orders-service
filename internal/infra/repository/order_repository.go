@@ -48,5 +48,14 @@ func (r *OrderRepository) GetAllOrders() ([]*entity.Order, error) {
 }
 
 func (r *OrderRepository) GetOrder(id string) (*entity.Order, error) {
-	return nil, nil
+	order, err := r.Db.GetOrder(context.Background(), id)
+	if err != nil {
+		return nil, err
+	}
+	return &entity.Order{
+		ID:         order.ID,
+		Price:      order.Price,
+		Tax:        order.Tax,
+		FinalPrice: order.FinalPrice,
+	}, nil
 }

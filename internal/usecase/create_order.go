@@ -38,7 +38,7 @@ func (c *CreateOrderUseCase) Execute(input OrderInputDTO) (OrderOutputDTO, error
 		ID:         order.ID,
 		Price:      order.Price,
 		Tax:        order.Tax,
-		FinalPrice: order.Price,
+		FinalPrice: order.FinalPrice,
 	}
 
 	// We dont really need this to be an interface since the event is just a value struct

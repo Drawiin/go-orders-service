@@ -79,6 +79,17 @@ func (suite *OrderRepositoryTestSuite) TestShouldGetSavedOrders_WhenGetAllOrders
 	suite.ElementsMatch(generateFakeOrders(), orders)
 }
 
+func (suite *OrderRepositoryTestSuite) TestShouldGetOrderById_WhenGetOrder() {
+	insertFakeOrders(suite)
+	order, err := suite.Repository.GetOrder("1")
+
+	suite.NoError(err)
+	suite.Equal("1", order.ID)
+	suite.Equal(10.0, order.Price)
+	suite.Equal(2.0, order.Tax)
+	suite.Equal(12.0, order.FinalPrice)
+}
+
 func generateFakeOrders() []*entity.Order {
 	return []*entity.Order{
 		{ID: "1", Price: 10.0, Tax: 2.0, FinalPrice: 12.0},
