@@ -8,15 +8,15 @@ import (
 )
 
 type WebOrderHandler struct {
-	CreateOrderUseCase  usecase.CreateOrderUseCase
-	GetAllOrders        usecase.GetAllOrdersUseCase
-	GetOrderByIdUseCase usecase.GetOrderByIdUseCase
+	CreateOrderUseCase  *usecase.CreateOrderUseCase
+	GetAllOrders        *usecase.GetAllOrdersUseCase
+	GetOrderByIdUseCase *usecase.GetOrderByIdUseCase
 }
 
 func NewWebOrderHandler(
-	CreateOrderUseCase usecase.CreateOrderUseCase,
-	GetAllOrdersUseCase usecase.GetAllOrdersUseCase,
-	GetOrderByIdUseCase usecase.GetOrderByIdUseCase,
+	CreateOrderUseCase *usecase.CreateOrderUseCase,
+	GetAllOrdersUseCase *usecase.GetAllOrdersUseCase,
+	GetOrderByIdUseCase *usecase.GetOrderByIdUseCase,
 ) *WebOrderHandler {
 	return &WebOrderHandler{
 		CreateOrderUseCase:  CreateOrderUseCase,
