@@ -4,9 +4,9 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cfg *config
+var cfg *Config
 
-type config struct {
+type Config struct {
 	DBDriver          string `mapstructure:"DB_DRIVER"`
 	DBHost            string `mapstructure:"DB_HOST"`
 	DBPort            string `mapstructure:"DB_PORT"`
@@ -22,7 +22,7 @@ type config struct {
 	GraphQLServerPort string `mapstructure:"GRAPHQL_SERVER_PORT"`
 }
 
-func LoadConfig(path string) (*config, error) {
+func LoadConfig(path string) (*Config, error) {
 	viper.SetConfigName("app_config")
 	viper.AddConfigPath(path)
 	viper.SetConfigType("env")
