@@ -4,12 +4,13 @@ import (
 	"github.com/drawiin/go-orders-service/internal/entity"
 	"github.com/drawiin/go-orders-service/internal/event"
 	"github.com/drawiin/go-orders-service/internal/infra/db"
+	"github.com/drawiin/go-orders-service/internal/infra/graph"
 	"github.com/drawiin/go-orders-service/internal/infra/repository"
+	"github.com/drawiin/go-orders-service/internal/infra/web/web_handler"
 	"github.com/drawiin/go-orders-service/internal/usecase"
 	"github.com/drawiin/go-orders-service/pkg/events"
 	"github.com/google/wire"
 )
-
 
 var OrderRepositorySet = wire.NewSet(
 	db.New,
@@ -33,4 +34,20 @@ var GetAllOrdersUseCaseSet = wire.NewSet(
 
 var GetOrderByIdUseCaseSet = wire.NewSet(
 	usecase.NewGetOrderByIdUseCase,
+)
+
+var WebOrderHandlerSet = wire.NewSet(
+	OrderRepositorySet,
+	CreateOrderUseCaseSet,
+	GetAllOrdersUseCaseSet,
+	GetOrderByIdUseCaseSet,
+	web_handler.NewWebOrderHandler,
+)
+
+var GraphQLResolverSet = wire.NewSet(
+	OrderRepositorySet,
+	CreateOrderUseCaseSet,
+	GetAllOrdersUseCaseSet,
+	GetOrderByIdUseCaseSet,
+	graph.NewResolver,
 )

@@ -4,9 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net/http"
 
+	graphql_handler "github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/drawiin/go-orders-service/config"
 	"github.com/drawiin/go-orders-service/internal/event/handler"
+	"github.com/drawiin/go-orders-service/internal/infra/graph"
 	"github.com/drawiin/go-orders-service/internal/infra/web/webserver"
 	"github.com/drawiin/go-orders-service/pkg/events"
 	"github.com/streadway/amqp"
@@ -24,7 +28,8 @@ func main() {
 	eventDispatcher := events.NewEventDispatcher()
 	eventDispatcher.Register("order.created", handler.NewOrderCreatedHandler(getRabbitMQChannel(config)))
 
-	startWebServer(config, dbConnection, eventDispatcher)
+	go startWebServer(config, dbConnection, eventDispatcher)
+	startGraphQLServer(config, dbConnection, eventDispatcher)
 }
 
 func startWebServer(config *config.Config, dbConnection *sql.DB, eventDispatcher *events.EventDispatcher) {
@@ -33,7 +38,16 @@ func startWebServer(config *config.Config, dbConnection *sql.DB, eventDispatcher
 	webserver.AddHandler("/orders/create", webHandler.Create)
 	webserver.AddHandler("/orders/list", webHandler.GetAll)
 	webserver.AddHandler("/orders/{id}", webHandler.GetById)
+	fmt.Println("Starting Web server on  port", config.WebServerPort)
 	webserver.Start()
+}
+
+func startGraphQLServer(config *config.Config, dbConnection *sql.DB, eventDispatcher *events.EventDispatcher) {
+	srv := graphql_handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: NewGraphQLResolver(dbConnection, eventDispatcher)}))
+	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	http.Handle("/query", srv)
+	fmt.Println("Starting GraphQL server on port", config.GraphQLServerPort)
+	http.ListenAndServe(":"+config.GraphQLServerPort, nil)
 }
 
 func getDbConnection(config *config.Config) *sql.DB {
