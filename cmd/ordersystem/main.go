@@ -7,7 +7,6 @@ import (
 
 	"github.com/drawiin/go-orders-service/config"
 	"github.com/drawiin/go-orders-service/internal/event/handler"
-	"github.com/drawiin/go-orders-service/internal/infra/db"
 	"github.com/drawiin/go-orders-service/internal/infra/web/webserver"
 	"github.com/drawiin/go-orders-service/pkg/events"
 	"github.com/streadway/amqp"
@@ -20,25 +19,17 @@ func main() {
 	config := getAppConfig()
 
 	dbConnection := getDbConnection(config)
-	dbQueries := db.New(dbConnection)
 	defer dbConnection.Close()
 
-	rabbitMqChannel := getRabbitMQChannel(config)
-
 	eventDispatcher := events.NewEventDispatcher()
-	eventDispatcher.Register("order.created", handler.NewOrderCreatedHandler(rabbitMqChannel))
+	eventDispatcher.Register("order.created", handler.NewOrderCreatedHandler(getRabbitMQChannel(config)))
 
-	// createOrderUserCase := NewCreateOrderUseCase(dbQueries, eventDispatcher)
-	// getAllOrdersUseCase := NewGetAllOrdersUseCase(dbQueries)
-	// getOrderByIdUseCase := NewGetOrderByIdUseCase(dbQueries)
-
+	// Setup WebServer
 	webserver := webserver.NewWebServer(config.WebServerPort)
-	webOrderHanler := NewWebOrderHandler(dbQueries, eventDispatcher)
-	webserver.AddHandler("/orders", webOrderHanler.Create)
-	fmt.Println("Starting web server on port", config.WebServerPort)
-	webserver.Start()
+	// webserver.AddHandler("/orders", NewWebOrderHandler(dbQueries, eventDispatcher))
 
-	// TODO Star Handller Here
+	// Start web server
+	webserver.Start()
 }
 
 func getDbConnection(config *config.Config) *sql.DB {

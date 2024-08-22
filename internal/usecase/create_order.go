@@ -41,6 +41,8 @@ func (c *CreateOrderUseCase) Execute(input OrderInputDTO) (OrderOutputDTO, error
 		FinalPrice: order.Price,
 	}
 
+	// We dont really need this to be an interface since the event is just a value struct
+
 	c.OrderCreated.SetPayload(dto)
 	c.EventDispatcher.Dispatch(c.OrderCreated)
 
