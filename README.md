@@ -1,23 +1,70 @@
-## What do i do need to run thin project ?
-- Docker & Docker compose
-- Go
+# Orders Service
 
-## How to run this project 
+## Prerequisites
 
-1. Configure all the variables on a `.env` file in the project root, the `.env.example` contains example values, the values can be easily used for testing 
-2. Make sure all necessary docker services are running <br>
-    > `docker compose up -d`
-3. Execute the migrations by running <br>
-    > `make migrate`
-4. Execte the project by running<br>
-    > `go run cmd/ordersystem/main.go cmd/ordersystem/wire_gen.go`
+Before running this project, ensure that the following dependencies are installed:
 
-## How to test this project
-- The `api/orders.http` contains example of how to make http requests
-- Accessing `localhost:<GRAPHQL_SERVER_PORT>` for the graphql playground
-- Evans can be used with the reflection option to test the grpc services by running `evans -r repl`
-    > **Make sure you have evans intalled
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
+- [Go](https://golang.org/)
 
-## Regenerate
-In clase you change any of the dependencies make sure to rerun wire
-> `wire gen ./cmd/ordersystem`
+## Setup and Running the Project
+
+1. **Environment Configuration:**
+
+   - The project already includes a `.env` file with the default env modify then if they dont work for you
+
+2. **Start Docker Services:**
+
+   - Ensure all required Docker services are up and running by executing:
+     ```bash
+     docker compose up -d
+     ```
+
+3. **Start the Application:**
+   - Run the project using the following Go command:
+     ```bash
+     go run cmd/ordersystem/main.go cmd/ordersystem/wire_gen.go
+     ```
+
+> **Tip:** The project includes php my admin access on [http://localhost:8080/](http://localhost:8080/)
+
+## Testing the Project
+
+### REST API Endpoints
+
+- **Base URL:** `http://localhost:8000`
+- **Available Endpoints:**
+  - Create Order: `POST /orders/create`
+  - List Orders: `GET /orders/list`
+  - Get Order by ID: `GET /orders/{id}`
+
+> **Tip:** You can find example HTTP requests in the `api/orders.http` file.
+
+### GraphQL
+
+- **Base URL:** `http://localhost:8081`
+- Access the GraphQL playground by visiting [localhost:8081](http://localhost:8081).
+- For further customization, the GraphQL server port can be changed via the `GRAPHQL_SERVER_PORT` environment variable.
+
+### gRPC
+
+To test the gRPC services, use [Evans](https://github.com/ktr0731/evans) with reflection support enabled. Run the following command:
+
+```bash
+evans -r repl
+```
+
+> **Note:** Ensure Evans is installed on your system.
+
+## Code Generation
+
+If you make any changes to the dependencies, be sure to regenerate the Wire dependency injection code with:
+
+```bash
+wire gen ./cmd/ordersystem
+```
+
+---
+
+This version is more polished and organized, making it easier to understand and follow.

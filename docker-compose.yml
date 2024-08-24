@@ -11,6 +11,12 @@ services:
       - "3306:3306"
     volumes:
       - .docker/mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 0s
   phpmyadmin:
     image: phpmyadmin
     container_name: phpmyadmin
@@ -35,3 +41,19 @@ services:
       RABBITMQ_DEFAULT_USER: "guest"
       RABBITMQ_DEFAULT_PASS: "guest"
       RABBITMQ_DEFAULT_VHOST: "/"
+  migrate:
+    image: migrate/migrate
+    depends_on:
+      mysql:
+        condition: service_healthy
+        restart: true
+    command:
+      [
+        "-path=/migrations/",
+        "-database",
+        "mysql://root:root@tcp(mysql:3306)/orders",
+        "-verbose",
+        "up",
+      ]
+    volumes:
+      - ./sql/migrations:/migrations
